@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>BNB Wallet Watch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2.75rem; }
+
+      :root{
+        --bg:#f6f6f2;
+        --surface:#ffffff;
+        --surface-2:#efefe8;
+        --ink:#171713;
+        --ink-2:#55554c;
+        --ink-3:#8a8a7d;
+        --line:#e2e2d6;
+        --accent:#f0b90b;
+        --accent-ink:#1a1500;
+        --accent-soft:#fdf3cd;
+        --green:#1a7f4b;
+        --red:#b3261e;
+        --radius:14px;
+        --shadow:0 1px 2px rgba(23,23,19,.05),0 10px 30px -18px rgba(23,23,19,.25);
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#101109;
+          --surface:#1a1b12;
+          --surface-2:#22231a;
+          --ink:#f2f1e6;
+          --ink-2:#b9b8a6;
+          --ink-3:#83826f;
+          --line:#2e2f22;
+          --accent-soft:#3a3312;
+          --green:#4cc983;
+          --red:#f08a84;
+          --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -18px rgba(0,0,0,.7);
+        }
+      }
+      *{box-sizing:border-box}
+      html{-webkit-text-size-adjust:100%}
+      body{
+        margin:0;background:var(--bg);color:var(--ink);
+        font-family:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+        font-size:16px;line-height:1.5;
+      }
+      .mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+      .wrap{max-width:940px;margin:0 auto;padding:28px 18px 56px}
+
+      /* ---------- Header ---------- */
+      header.top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:22px}
+      .brand{display:flex;align-items:flex-start;gap:13px;min-width:0;flex:1 1 320px}
+      .brand > div{min-width:0}
+      .coin{
+        width:46px;height:46px;flex:0 0 46px;margin-top:2px;border-radius:12px;background:var(--accent);
+        display:grid;place-items:center;color:var(--accent-ink);
+      }
+      .coin svg{width:26px;height:26px;display:block}
+      h1{font-size:clamp(24px,4.5vw,32px);line-height:1.1;margin:0;font-weight:800;letter-spacing:-.02em}
+      .tagline{margin:3px 0 0;color:var(--ink-2);font-size:14.5px;max-width:52ch}
+      .net{
+        display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border:1px solid var(--line);
+        background:var(--surface);border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-2);
+        white-space:nowrap;
+      }
+      .net .dot{width:8px;height:8px;border-radius:50%;background:var(--ink-3);flex:0 0 8px}
+      .net.ok .dot{background:var(--green)}
+      .net.bad .dot{background:var(--red)}
+
+      /* ---------- Search ---------- */
+      .search-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+      .search-card label{display:block;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);margin-bottom:9px}
+      .search-row{display:flex;gap:10px}
+      .search-row input{
+        flex:1;min-width:0;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);
+        color:var(--ink);padding:10px 14px;font-size:14.5px;outline:none;
+      }
+      .search-row input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+      .search-row input.invalid{border-color:var(--red)}
+      .btn{
+        border:0;border-radius:10px;padding:10px 22px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;
+        display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;
+      }
+      .btn-primary{background:var(--accent);color:var(--accent-ink)}
+      .btn-primary:hover{filter:brightness(1.05)}
+      .btn-primary:disabled{opacity:.55;cursor:wait}
+      .btn-ghost{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
+      .btn-ghost:hover{border-color:var(--ink-3)}
+      .hint{margin:10px 0 0;font-size:13.5px;color:var(--ink-3)}
+      .hint.error{color:var(--red);font-weight:600}
+      .examples{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;align-items:center}
+      .examples[hidden]{display:none}
+      .examples span{font-size:13px;color:var(--ink-3);font-weight:600}
+      .chip{
+        border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;
+        padding:6px 13px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-height:2.25rem;
+      }
+      .chip:hover{border-color:var(--accent);background:var(--accent-soft)}
+
+      /* ---------- Results ---------- */
+      #results{margin-top:20px;display:none}
+      #results.show{display:block}
+      .addr-bar{
+        display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--surface);
+        border:1px solid var(--line);border-radius:var(--radius);padding:13px 16px;box-shadow:var(--shadow);
+      }
+      .addr-bar .addr{font-size:13.5px;word-break:break-all;font-weight:500}
+      .addr-bar .spacer{flex:1}
+      .mini-btn{
+        border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:8px;
+        padding:6px 12px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;min-height:2.25rem;
+        display:inline-flex;align-items:center;gap:6px;text-decoration:none;
+      }
+      .mini-btn:hover{border-color:var(--ink-3)}
+
+      .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
+      .stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);min-width:0}
+      .stat .k{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
+      .stat .v{font-size:23px;font-weight:800;letter-spacing:-.01em;line-height:1.15;margin:0;word-break:break-word}
+      .stat .v small{font-size:13px;font-weight:700;color:var(--ink-2)}
+      .stat .sub{margin:4px 0 0;font-size:13px;color:var(--ink-2)}
+      .stat.hero{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+      .stat.hero .k{color:rgba(26,21,0,.65)}
+      .stat.hero .sub{color:rgba(26,21,0,.75)}
+      .stat.hero .v small{color:rgba(26,21,0,.7)}
+
+      /* ---------- History ---------- */
+      .tx-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-top:12px;padding:18px}
+      .tx-card h2{font-size:17px;margin:0 0 6px;font-weight:800;letter-spacing:-.01em}
+      .tx-card p{margin:0 0 14px;font-size:14.5px;color:var(--ink-2);max-width:62ch}
+      .tx-card p strong{color:var(--ink)}
+      .tx-links{display:flex;flex-wrap:wrap;gap:10px}
+      .tx-links .btn{min-height:2.75rem}
+
+      .spinner{
+        width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(26,21,0,.25);border-top-color:var(--accent-ink);
+        animation:spin .7s linear infinite;display:none;flex:0 0 16px;
+      }
+      .btn-primary:disabled .spinner{display:block}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      @media (prefers-reduced-motion: reduce){.spinner{animation:none}}
+
+      /* ---------- Under the hood / footer ---------- */
+      .hood{margin-top:34px;border-top:1px solid var(--line);padding-top:20px}
+      .hood h2{font-size:15px;margin:0 0 10px;font-weight:800}
+      .hood-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+      .hood-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+      .hood-item h3{margin:0 0 4px;font-size:13.5px;font-weight:800}
+      .hood-item p{margin:0;font-size:13px;color:var(--ink-2);word-break:break-word}
+      .hood-item p.mono{font-size:11.5px}
+      footer{margin-top:26px;font-size:13px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between}
+      footer a{color:var(--ink-2)}
+
+      @media (max-width:720px){
+        .stats{grid-template-columns:1fr 1fr}
+        .hood-grid{grid-template-columns:1fr}
+        .search-row{flex-direction:column}
+        .search-row .btn{width:100%}
+        .tx-links .btn{flex:1}
+        header.top{flex-direction:column}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+
+      <header class="top">
+        <div class="brand">
+          <div class="coin" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.4 14.8 7.2 12 10 9.2 7.2 12 4.4ZM7.2 9.2 4.4 12l2.8 2.8L10 12 7.2 9.2Zm9.6 0L14 12l2.8 2.8L19.6 12 16.8 9.2ZM12 14l-2.8 2.8L12 19.6l2.8-2.8L12 14Z"/></svg>
+          </div>
+          <div>
+            <h1>BNB Wallet Watch</h1>
+            <p class="tagline">Paste any BNB Smart Chain address to see its BNB balance in BNB and dollars, live from a public RPC — no API key, no sign-up. Recent transactions open on the explorers, one tap away.</p>
+          </div>
+        </div>
+        <div class="net" id="netBadge" title="Latest block reported by the BSC public RPC">
+          <span class="dot"></span><span id="netText">Connecting to BSC…</span>
+        </div>
+      </header>
+
+      <section class="search-card">
+        <form id="lookupForm" novalidate>
+          <label for="addrInput">Wallet address</label>
+          <div class="search-row">
+            <input id="addrInput" class="mono" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+              placeholder="0x…" aria-describedby="formHint" />
+            <button class="btn btn-primary" id="lookupBtn" type="submit">
+              <span class="spinner" aria-hidden="true"></span><span id="lookupBtnText">Look up</span>
+            </button>
+          </div>
+          <p class="hint" id="formHint">Works with any address on BNB Smart Chain (BEP-20 network), including exchange and contract addresses.</p>
+        </form>
+        <div class="examples">
+          <span>Try:</span>
+          <button class="chip" type="button" data-example="0x8894E0a0c962CB723c1976a4421c95949bE2D4E3">Binance hot wallet</button>
+          <button class="chip" type="button" data-example="0xBE0eB53F46cd790Cd13851d5EFf43D12404d33E8">Binance cold wallet</button>
+          <button class="chip" type="button" data-example="0x000000000000000000000000000000000000dEaD">Burn address</button>
+        </div>
+        <div class="examples" id="recentRow" hidden>
+          <span>Recent:</span>
+          <span id="recentChips" style="display:contents"></span>
+        </div>
+      </section>
+
+      <section id="results" aria-live="polite">
+        <div class="addr-bar">
+          <span class="addr mono" id="resAddr">—</span>
+          <span class="spacer"></span>
+          <button class="mini-btn" id="copyBtn" type="button">Copy address</button>
+          <button class="mini-btn" id="refreshBtn" type="button">↻ Refresh</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat hero">
+            <p class="k">BNB balance</p>
+            <p class="v" id="statBnb">—</p>
+            <p class="sub" id="statBnbSub">&nbsp;</p>
+          </div>
+          <div class="stat">
+            <p class="k">Value in USD</p>
+            <p class="v" id="statUsd">—</p>
+            <p class="sub" id="statUsdSub">&nbsp;</p>
+          </div>
+          <div class="stat">
+            <p class="k">BNB price</p>
+            <p class="v" id="statPrice">—</p>
+            <p class="sub">Live spot price</p>
+          </div>
+          <div class="stat">
+            <p class="k">Transactions sent</p>
+            <p class="v" id="statNonce">—</p>
+            <p class="sub">Outgoing count (nonce)</p>
+          </div>
+        </div>
+
+        <div class="tx-card">
+          <h2>Recent transactions</h2>
+          <p id="txNote">The explorers keep the full, searchable history for every address — amounts, timestamps, and status for each transaction.</p>
+          <div class="tx-links">
+            <a class="btn btn-primary" id="scanLink" href="#" target="_blank" rel="noopener">Recent transactions on BscScan ↗</a>
+            <a class="btn btn-ghost" id="traceLink" href="#" target="_blank" rel="noopener">Same address on BscTrace ↗</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="hood">
+        <h2>Under the hood</h2>
+        <div class="hood-grid">
+          <div class="hood-item">
+            <h3>Balance — public BSC RPC</h3>
+            <p class="mono">eth_getBalance via bsc-dataseed.binance.org, with publicnode.com as fallback. Plain JSON-RPC, no key.</p>
+          </div>
+          <div class="hood-item">
+            <h3>Price — Binance public API</h3>
+            <p class="mono">BNBUSDT spot ticker from data-api.binance.vision, CoinGecko as fallback. Refreshed on every lookup.</p>
+          </div>
+          <div class="hood-item">
+            <h3>History — the explorers</h3>
+            <p class="mono">BscScan's old keyless API was retired (its replacement needs a paid key), so history opens on BscScan and BscTrace, which list every transaction for the address.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <span>BNB Wallet Watch — a read-only viewer. It never asks for a seed phrase or private key; any site that does is a scam.</span>
+        <span>Data: BSC RPC · Binance · CoinGecko</span>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var RPC_ENDPOINTS = [
+          "https://bsc-dataseed.binance.org",
+          "https://bsc-dataseed1.defibit.io",
+          "https://bsc-rpc.publicnode.com"
+        ];
+
+        var form = document.getElementById("lookupForm");
+        var input = document.getElementById("addrInput");
+        var hint = document.getElementById("formHint");
+        var btn = document.getElementById("lookupBtn");
+        var btnText = document.getElementById("lookupBtnText");
+        var results = document.getElementById("results");
+        var netBadge = document.getElementById("netBadge");
+        var netText = document.getElementById("netText");
+
+        var HINT_DEFAULT = "Works with any address on BNB Smart Chain (BEP-20 network), including exchange and contract addresses.";
+        var TX_NOTE_DEFAULT = "The explorers keep the full, searchable history for every address — amounts, timestamps, and status for each transaction.";
+        var currentAddress = null;
+        var lookupSeq = 0;
+        var recent = [];
+
+        var usdFmt = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+        var usdFmtSmall = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 6 });
+        var numFmt = new Intl.NumberFormat("en-US");
+
+        function isValidAddress(a) { return /^0x[0-9a-fA-F]{40}$/.test(a || ""); }
+        function shortAddr(a) { return a ? a.slice(0, 8) + "…" + a.slice(-6) : "—"; }
+
+        function fetchWithTimeout(url, options, ms) {
+          var ctrl = new AbortController();
+          var t = setTimeout(function () { ctrl.abort(); }, ms || 12000);
+          var opts = options || {};
+          opts.signal = ctrl.signal;
+          return fetch(url, opts).finally(function () { clearTimeout(t); });
+        }
+
+        function rpcCall(method, params) {
+          var body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: method, params: params });
+          var chain = Promise.reject(new Error("no endpoint tried"));
+          RPC_ENDPOINTS.forEach(function (url) {
+            chain = chain.catch(function () {
+              return fetchWithTimeout(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: body
+              }).then(function (r) {
+                if (!r.ok) throw new Error("RPC HTTP " + r.status);
+                return r.json();
+              }).then(function (j) {
+                if (j.error) throw new Error(j.error.message || "RPC error");
+                return j.result;
+              });
+            });
+          });
+          return chain;
+        }
+
+        function weiToBnb(weiBig) {
+          var str = weiBig.toString().padStart(19, "0");
+          var intPart = str.slice(0, str.length - 18);
+          var fracPart = str.slice(str.length - 18);
+          var display = intPart + "." + fracPart.slice(0, 6);
+          var num = parseFloat(intPart + "." + fracPart);
+          return { num: num, display: display.replace(/\.?0+$/, "") || "0" };
+        }
+
+        function fmtBnbFromWei(weiStr) {
+          try { return weiToBnb(BigInt(weiStr)); }
+          catch (e) { var n = Number(weiStr) / 1e18; return { num: n, display: String(Math.round(n * 1e6) / 1e6) }; }
+        }
+
+        function binancePrice(url) {
+          return fetchWithTimeout(url, {}, 8000)
+            .then(function (r) { if (!r.ok) throw new Error("price HTTP " + r.status); return r.json(); })
+            .then(function (j) { var p = parseFloat(j.price); if (!isFinite(p)) throw new Error("bad price"); return p; });
+        }
+        function fetchPrice() {
+          // data-api.binance.vision is Binance's public market-data host (no geo block);
+          // api.binance.com and CoinGecko are fallbacks.
+          return binancePrice("https://data-api.binance.vision/api/v3/ticker/price?symbol=BNBUSDT")
+            .catch(function () { return binancePrice("https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT"); })
+            .catch(function () {
+              return fetchWithTimeout("https://api.coingecko.com/api/v3/simple/price?ids=binancecoin&vs_currencies=usd", {}, 8000)
+                .then(function (r) { if (!r.ok) throw new Error("cg HTTP " + r.status); return r.json(); })
+                .then(function (j) { var p = j && j.binancecoin && j.binancecoin.usd; if (!isFinite(p)) throw new Error("bad cg price"); return p; });
+            });
+        }
+
+        function setHint(msg, isError) {
+          hint.textContent = msg;
+          hint.classList.toggle("error", !!isError);
+          input.classList.toggle("invalid", !!isError);
+        }
+
+        function setLoading(on) {
+          btn.disabled = on;
+          btnText.textContent = on ? "Fetching…" : "Look up";
+        }
+
+        function renderRecent() {
+          var row = document.getElementById("recentRow");
+          var holder = document.getElementById("recentChips");
+          holder.innerHTML = "";
+          if (!recent.length) { row.hidden = true; return; }
+          row.hidden = false;
+          recent.forEach(function (a) {
+            var b = document.createElement("button");
+            b.type = "button"; b.className = "chip mono"; b.textContent = shortAddr(a);
+            b.title = a;
+            b.addEventListener("click", function () { input.value = a; lookup(a); });
+            holder.appendChild(b);
+          });
+        }
+
+        function remember(addr) {
+          var low = addr.toLowerCase();
+          recent = recent.filter(function (a) { return a.toLowerCase() !== low; });
+          recent.unshift(addr);
+          recent = recent.slice(0, 4);
+          renderRecent();
+        }
+
+        function lookup(address) {
+          var seq = ++lookupSeq;
+          currentAddress = address;
+          results.classList.add("show");
+          document.getElementById("resAddr").textContent = address;
+          document.getElementById("scanLink").href = "https://bscscan.com/address/" + address;
+          document.getElementById("traceLink").href = "https://bsctrace.com/address/" + address;
+          document.getElementById("txNote").textContent = TX_NOTE_DEFAULT;
+          setLoading(true);
+          setHint(HINT_DEFAULT, false);
+          ["statBnb", "statUsd", "statPrice", "statNonce"].forEach(function (id) {
+            document.getElementById(id).textContent = "…";
+          });
+          document.getElementById("statBnbSub").textContent = " ";
+          document.getElementById("statUsdSub").textContent = " ";
+          results.scrollIntoView({ behavior: "smooth", block: "start" });
+
+          var balanceP = rpcCall("eth_getBalance", [address, "latest"]);
+          var nonceP = rpcCall("eth_getTransactionCount", [address, "latest"]).catch(function () { return null; });
+          var priceP = fetchPrice().catch(function () { return null; });
+
+          Promise.all([balanceP, priceP]).then(function (res) {
+            if (seq !== lookupSeq) return;
+            var weiHex = res[0];
+            var price = res[1];
+            var bal = fmtBnbFromWei(BigInt(weiHex).toString());
+            var statBnb = document.getElementById("statBnb");
+            statBnb.innerHTML = "";
+            var v = document.createElement("span"); v.textContent = bal.display + " ";
+            var sm = document.createElement("small"); sm.textContent = "BNB";
+            v.appendChild(sm);
+            statBnb.appendChild(v);
+            document.getElementById("statBnbSub").textContent = "On BNB Smart Chain · block-confirmed";
+            if (price) {
+              var usd = bal.num * price;
+              document.getElementById("statUsd").textContent = usd < 0.01 && usd > 0 ? usdFmtSmall.format(usd) : usdFmt.format(usd);
+              document.getElementById("statUsdSub").textContent = "At " + usdFmt.format(price) + " per BNB";
+              document.getElementById("statPrice").textContent = usdFmt.format(price);
+            } else {
+              document.getElementById("statUsd").textContent = "—";
+              document.getElementById("statUsdSub").textContent = "Price feed unavailable right now";
+              document.getElementById("statPrice").textContent = "—";
+            }
+            remember(address);
+          }).catch(function () {
+            if (seq !== lookupSeq) return;
+            document.getElementById("statBnb").textContent = "—";
+            document.getElementById("statUsd").textContent = "—";
+            document.getElementById("statPrice").textContent = "—";
+            document.getElementById("statBnbSub").textContent = "Could not reach the BSC RPC. Check your connection and try Refresh.";
+            setHint("The BSC public RPC did not respond. Your address is fine — try again in a moment.", true);
+          }).finally(function () {
+            if (seq === lookupSeq) setLoading(false);
+          });
+
+          nonceP.then(function (nonceHex) {
+            if (seq !== lookupSeq || nonceHex == null) return;
+            var n = parseInt(nonceHex, 16);
+            document.getElementById("statNonce").textContent = numFmt.format(n);
+            var note = document.getElementById("txNote");
+            note.innerHTML = "";
+            note.appendChild(document.createTextNode("This address has sent "));
+            var strong = document.createElement("strong");
+            strong.textContent = numFmt.format(n) + " transaction" + (n === 1 ? "" : "s");
+            note.appendChild(strong);
+            note.appendChild(document.createTextNode(" so far. Incoming transfers don't add to that count — the explorers list both directions, newest first:"));
+          });
+        }
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var a = input.value.trim();
+          if (!isValidAddress(a)) {
+            setHint("That doesn't look like a BSC address. It should start with 0x followed by 40 characters (letters a–f and numbers).", true);
+            input.focus();
+            return;
+          }
+          lookup(a);
+        });
+
+        input.addEventListener("input", function () {
+          if (hint.classList.contains("error")) setHint(HINT_DEFAULT, false);
+        });
+
+        document.querySelectorAll("[data-example]").forEach(function (b) {
+          b.addEventListener("click", function () {
+            var a = b.getAttribute("data-example");
+            input.value = a;
+            lookup(a);
+          });
+        });
+
+        document.getElementById("refreshBtn").addEventListener("click", function () {
+          if (currentAddress) lookup(currentAddress);
+        });
+
+        document.getElementById("copyBtn").addEventListener("click", function () {
+          var b = this;
+          if (!currentAddress) return;
+          function done() {
+            var old = b.textContent;
+            b.textContent = "Copied ✓";
+            setTimeout(function () { b.textContent = old; }, 1600);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(currentAddress).then(done).catch(done);
+          } else { done(); }
+        });
+
+        // Network badge: latest block from the public RPC.
+        rpcCall("eth_blockNumber", []).then(function (hex) {
+          netBadge.classList.add("ok");
+          netText.textContent = "BSC live · block " + numFmt.format(parseInt(hex, 16));
+        }).catch(function () {
+          netBadge.classList.add("bad");
+          netText.textContent = "BSC RPC unreachable";
+        });
+
+        // Prefill from ?address=0x… if present.
+        try {
+          var q = new URLSearchParams(window.location.search).get("address");
+          if (q && isValidAddress(q.trim())) { input.value = q.trim(); lookup(q.trim()); }
+        } catch (e) { /* no query string support needed */ }
+      })();
+    </script>
+  </body>
+</html>
